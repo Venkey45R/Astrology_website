@@ -1,39 +1,26 @@
 // routes/auth.js
 const express = require("express");
-const passport = require("passport");
-const jwt = require("jsonwebtoken");
+// Removed Passport.js as it's not used for the direct POST flow
+// const passport = require("passport");
+// const jwt = require("jsonwebtoken"); // jwt is used by generateToken, so no direct import needed here
 const User = require("../models/User");
 const { protect } = require("../middleware/authmiddleware");
-const generateToken = require("../utils/generateToken");
+const generateToken = require("../utils/generateToken"); // Keep this for JWT generation
 
 const router = express.Router();
 
-const generateTokenAndSetCookie = (user, res) => {
-  const token = jwt.sign(
-    {
-      id: user._id,
-      role: user.role,
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "1d",
-    }
-  );
+// Removed generateTokenAndSetCookie as it was for HTTP-only cookies with Passport.js
+// const generateTokenAndSetCookie = (user, res) => { ... };
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 24 * 60 * 60 * 1000,
-    sameSite: "Lax",
-  });
-};
+// Removed Passport.js initiation route
+// router.get(
+//   "/google",
+//   passport.authenticate("google", {
+//     scope: ["profile", "email"],
+//   })
+// );
 
-router.get(
-  "/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-  })
-);
+// This is your desired direct POST route for Google sign-in/sign-up
 router.post("/google", async (req, res) => {
   const { email, name, photo } = req.body;
 
@@ -85,43 +72,14 @@ router.post("/google", async (req, res) => {
   }
 });
 
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: `${process.env.CLIENT_URL}/login?error=auth_failed`,
-    session: false,
-  }),
-  async (req, res) => {
-    try {
-      const { id, displayName, photos, emails } = req.user;
+// Removed Passport.js callback route
+// router.get(
+//   "/google/callback",
+//   passport.authenticate("google", { ... }),
+//   async (req, res) => { ... }
+// );
 
-      let user = await User.findOne({
-        email: emails[0].value,
-      });
-
-      if (user) {
-        user.name = displayName;
-        user.photo = photos[0].value;
-        await user.save();
-      } else {
-        user = await User.create({
-          name: displayName,
-          email: emails[0].value,
-          photo: photos[0].value,
-          role: "user",
-        });
-      }
-
-      generateTokenAndSetCookie(user, res);
-
-      res.redirect(`${process.env.CLIENT_URL}/dashboard`);
-    } catch (error) {
-      console.error("Error during Google OAuth callback:", error);
-      res.redirect(`${process.env.CLIENT_URL}/login?error=server_error`);
-    }
-  }
-);
-
+// Keep the logout route as it is, as frontend will clear its own token
 router.get("/logout", (req, res) => {
   try {
     res.status(200).json({
@@ -135,6 +93,7 @@ router.get("/logout", (req, res) => {
   }
 });
 
+// Keep the protected /me route
 router.get("/me", protect, (req, res) => {
   res.status(200).json(req.user);
 });
