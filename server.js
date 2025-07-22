@@ -6,9 +6,9 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const connectDB = require("./Astrology_website/config/db");
-const User = require("./Astrology_website/models/User");
-const authRoutes = require("./Astrology_website/routes/auth");
+const connectDB = require("./config/db");
+const User = require("./models/User");
+const authRoutes = require("./routes/auth");
 
 dotenv.config();
 
