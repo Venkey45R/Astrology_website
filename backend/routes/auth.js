@@ -5,18 +5,6 @@ const generateToken = require("../utils/generateToken");
 
 const router = express.Router();
 
-// Removed generateTokenAndSetCookie as it was for HTTP-only cookies with Passport.js
-// const generateTokenAndSetCookie = (user, res) => { ... };
-
-// Removed Passport.js initiation route
-// router.get(
-//   "/google",
-//   passport.authenticate("google", {
-//     scope: ["profile", "email"],
-//   })
-// );
-
-// This is your desired direct POST route for Google sign-in/sign-up
 router.post("/google", async (req, res) => {
   const { email, name, photo } = req.body;
 
@@ -68,14 +56,6 @@ router.post("/google", async (req, res) => {
   }
 });
 
-// Removed Passport.js callback route
-// router.get(
-//   "/google/callback",
-//   passport.authenticate("google", { ... }),
-//   async (req, res) => { ... }
-// );
-
-// Keep the logout route as it is, as frontend will clear its own token
 router.get("/logout", (req, res) => {
   try {
     res.status(200).json({
@@ -89,7 +69,6 @@ router.get("/logout", (req, res) => {
   }
 });
 
-// Keep the protected /me route
 router.get("/me", protect, (req, res) => {
   res.status(200).json(req.user);
 });
