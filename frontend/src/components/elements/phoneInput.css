@@ -1,0 +1,10 @@
+.phone-input input {
+    border-radius: 10px;
+    border: 1px solid hsla(0, 0%, 0%, 0.2);
+    padding: 8px 16px;
+    outline: none;
+}
+
+.phone-input input:focus {
+    border: 1px solid hsla(0, 0%, 0%, 0.8); 
+}
