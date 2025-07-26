@@ -3,7 +3,10 @@ import Button from './elements/Button'
 import SigninButton from './elements/SigninButton'
 import { Link } from 'react-router'
 import Cookies from "js-cookie";
+import { Axios } from 'axios';
+Axios.defaults.withCredentials = true;
 const Navbar = () => {
+  
   const [loggedIn, setLoggedIn] = useState(false);
    useEffect(() => {
       const token = Cookies.get("token");
