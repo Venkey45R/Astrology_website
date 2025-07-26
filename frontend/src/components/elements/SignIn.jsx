@@ -2,10 +2,21 @@ import React from 'react';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../firebaseConfig/firebaseConfig';
 import { FaGoogle } from "react-icons/fa";
-import { useNavigate } from 'react-router';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import StaticLandingPage from "./StaticLandingPage";
 
-const SignIn = ({ setUser }) => {
+// Ensure axios sends cookies with requests
+axios.defaults.withCredentials = true;
+
+const API_BASE_URL = (
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
+).replace(/\/+$/, "");
+
+const SignIn = () => {
   const navigate = useNavigate();
 
   const handleGoogleSignIn = async () => {

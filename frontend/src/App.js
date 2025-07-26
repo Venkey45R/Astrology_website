@@ -16,6 +16,12 @@ import AuthenticateAdmin from './components/AuthenticateAdmin';
 import UnauthorizedPage from './pages/UnauthorizedPages';
 import AdminDashboard from './pages/AdminDashBoard';
 import Footer from './components/Footer';
+import Navbar from './components/Navbar';
+
+import SlotManager from './pages/SlotManager';
+import AppointmentForm from './components/AppointmentForm';
+import AppointmentViewer from './pages/AppointmentsViewer';
+import UserManager from './pages/UserManager';
 
 function App() {
 
@@ -24,23 +30,37 @@ function App() {
     <div className="App">
       <header className="App-header">
       <ToastContainer />
+        <Navbar/>
         <Routes>
           <Route path="/" element={<GoogleSignin />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="/booking" element={<Booking />} />
+          <Route path="/your-orders" element={<UserOrders />} />
 
-          
           {/* Route for unauthorized access */}
           {/* Protected Admin Route */}
           <Route
-            path="/admin-dashboard"
+            path="/admin"
             element={
               <AuthenticateAdmin>
                 <AdminDashboard />
               </AuthenticateAdmin>
             }
             />
+             <Route path='admin/appointment-viewer' element={<AuthenticateAdmin>
+               <AppointmentViewer/>
+              </AuthenticateAdmin>
+              }/>
+               <Route path='/admin/slot-management' element={<AuthenticateAdmin>
+               <SlotManager/>
+              </AuthenticateAdmin>
+              }/>
+               <Route path='/admin/user-management' element={<AuthenticateAdmin>
+               <UserManager/>
+              </AuthenticateAdmin>
+              }/>
+              
           {/* Add other routes here as your application grows */}
         </Routes>
         <Footer/>

@@ -1,18 +1,62 @@
 import axios from "axios";
 import React from "react";
+import { useState } from "react";
+import { useEffect } from "react";
 import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
 import { useNavigate } from "react-router";
 import { v4 as uuid } from "uuid";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+
+const API_BASE_URL = (
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
+).replace(/\/+$/, "");
+
 const PaymentComponent = ({paymentAmount,formData,userInfo}) => {
+  // console.log(userInfo)
   const navigate = useNavigate()
   const { error, isLoading, Razorpay } = useRazorpay();
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    const savedToken = Cookies.get("token");
+    if (savedToken) {
+      setToken(savedToken);
+    }
+  }, []);
   const handlePaymentSucess = async (data) =>{
-    console.log(data)
-    const response = await axios.put(`https://astroprod.onrender.com/api/bookings/${data._id}`,{...data , payment_status : true})
+    // console.log(data)
+    const response = await axios.put(`${API_BASE_URL}/api/bookings/${data._id}`,{...data , payment_status : true},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // update as needed
+          },
+        })
     navigate('/PaymentSuccess');
   }
+  // console.log(userInfo)
+  const blockSlot = async () => {
+      try {
+        await axios.post(
+          `${API_BASE_URL}/api/unavailable-slots`,
+          {
+            date: formData.pickedDate,
+            timeSlot: formData.timeSlot,
+            isAvailable: false,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("Slot blocked successfully.");
+      } catch (error) {
+        console.error("Failed to block slot:", error);
+      }
+    };
   const handlePayment = async () => {
-      const { data } = await axios.post('https://astroprod.onrender.com/create-order', {
+      const { data } = await axios.post(`${API_BASE_URL}/create-order`, {
         amount: paymentAmount*100
       });
        const formatedFormData = {
@@ -28,28 +72,70 @@ const PaymentComponent = ({paymentAmount,formData,userInfo}) => {
       };
       let book;
      try{
-       const booking = await axios.post("https://astroprod.onrender.com/api/bookings",formatedFormData)
+       const booking = await axios.post(
+        `${API_BASE_URL}/api/bookings`,
+        formatedFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // update as needed
+          },
+        }
+      );
        book = booking.data;
+       await blockSlot();
      }
      catch(err){
       console.log(err)
      }
-      paymentAmount = paymentAmount*100
+    
       const options = {
       key: "rzp_test_oL9kEoW0Vxdk0a",
-      amount: {paymentAmount}, 
+      amount: paymentAmount*100, 
       currency: "INR",
       name: "Astro",
       description: "Test Transaction",
       order_id: data.id,
-      handler:  handlePaymentSucess(book),
+      handler: async (response) => {
+      // console.log("Payment response:", response);
+      try {
+        // 1. Send payment verification data to backend
+        const verifyRes = await axios.post(`${API_BASE_URL}/verify-payment`, {
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_signature: response.razorpay_signature,
+
+        });
+        // console.log(verifyRes,"hello")
+        if (verifyRes.data.success) {
+          // 2. Update booking payment status
+          handlePaymentSucess(data)
+          await axios.put(
+            `${API_BASE_URL}/api/bookings/${book._id}`,
+            { payment_status: true },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+         
+          navigate("/PaymentSuccess");
+        } else {
+          toast.error("Payment verification failed.");
+        }
+         
+      } catch (error) {
+        console.error("Verification error:", error);
+        toast.error("Something went wrong verifying the payment.");
+      }
+    },
       prefill: {
-        name: "John Doe",
-        email: "john.doe@example.com",
-        contact: "9999999999",
+        name: formData.name,
+        email: formData.email,
+        contact: formData.whatsapp_number,
       },
       theme: {
-        color: "#F37254",
+        color: "#401F8F",
       },
     };
 

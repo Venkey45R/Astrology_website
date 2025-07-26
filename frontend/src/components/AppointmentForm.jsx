@@ -10,8 +10,18 @@ import PaymentComponent from './PaymentComponent';
 import {v4 as uuid } from "uuid"
 import cities from '../citiesJson/cities';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router';
+import Cookies from "js-cookie";
+import dayjs from "dayjs";
+// Ensure axios sends cookies with requests
+axios.defaults.withCredentials = true;
 
+const API_BASE_URL = (
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
+).replace(/\/+$/, "");
 const AppointmentForm = ({userInfo}) => {
+    // console.log(userInfo)
     const [step,setStep] = useState(1)
     const [number,setNumber] = useState()
     const [appointmentType,setAppointmentType] = useState(null)
@@ -27,6 +37,11 @@ const AppointmentForm = ({userInfo}) => {
         paymentStatus : false,
         bookingId : uuid()
     })
+    const [user,setUser] =useState()
+  const [loading, setLoading] = useState(true);
+  
+  const navigate = useNavigate()
+
  const generateTimeSlots = () => {
   const start = new Date();
   start.setHours(8, 0, 0, 0); // 08:00 AM
@@ -51,17 +66,17 @@ const AppointmentForm = ({userInfo}) => {
 const allSlotRanges = generateTimeSlots(); // e.g. ["08:00 AM - 08:30 AM", "08:30 AM - 09:00 AM", ...]
 
 const timeSlots = allSlotRanges.map((time) => {
-  const isUnavailable = unavailableSlots.some(
-    (slot) =>
-      slot.date === formData.pickedDate && slot.timeSlot === time
-  );
+  const isUnavailable = unavailableSlots.some((slot) => {
+    const slotDate = dayjs(slot.date).format("YYYY-MM-DD");
+    return slotDate === formData.pickedDate && slot.timeSlot === time;
+  });
 
   return {
     time,
     isAvailable: !isUnavailable
   };
 });
-console.log(timeSlots)
+// console.log(timeSlots)
     const handleNext = () => {
         if(step === 1 && !appointmentType){
             return
@@ -116,14 +131,70 @@ console.log(timeSlots)
      };
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/unavailable-slots")
+        const token = Cookies.get("token"); 
+        axios.get(`${API_BASE_URL}/api/unavailable-slots`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
             .then((res) => {
             setUnavailableSlots(res.data);
-            console.log(res.data) // format: [{ date: '2024-07-15', time: '10:00 AM' }]
+            // console.log(res.data) // format: [{ date: '2024-07-15', time: '10:00 AM' }]
             })
             .catch((err) => {
             console.error("Failed to fetch unavailable slots", err);
             });
+         const fetchUserProfile = async () => {
+      const token = Cookies.get("token"); // Get the token from the cookie
+
+      if (!token) {
+        toast.error("You are not logged in. Redirecting to sign-in.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        navigate("/"); // Redirect to sign-in page if no token
+        return;
+      }
+
+      try {
+        // Send the token in the Authorization header as a Bearer token
+        const response = await axios.get(`${API_BASE_URL}/api/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUser(response.data);
+        // console.log(response.data)
+      } catch (error) {
+        console.error(
+          "Failed to fetch user profile:",
+          error.response?.data || error.message
+        );
+        toast.error("Failed to load profile. Please log in again.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        // Clear potentially invalid token and redirect
+        Cookies.remove("token");
+        Cookies.remove("role");
+        Cookies.remove("id");
+        navigate("/");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
     }, [formData.pickedDate]);
   return (
     <div className='w-full my-8'>
@@ -228,7 +299,7 @@ console.log(timeSlots)
                             <select className='w-full py-2 px-4 mt-2 border border-black/20 rounded-lg text-black' onChange={(e) => setFormData({...formData , city : e.target.value})} id="city">
                                 {
                                     cities.map((city) =>
-                                   ( <option value={city.name} id={city.id} className='text-black'>
+                                   ( <option  value={city.name} id={city.id} className='text-black'>
                                         {city.name}
                                     </option>))
                                 }
@@ -333,7 +404,7 @@ console.log(timeSlots)
                         )
                     }
                     {
-                        step === 4 && (<PaymentComponent formData={formData} userInfo={userInfo} paymentAmount={formData.price}/>)
+                        step === 4 && (<PaymentComponent formData={formData} userInfo={user} paymentAmount={formData.price}/>)
                     }
             </div>
     </div>
