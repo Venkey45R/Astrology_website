@@ -22,6 +22,7 @@ import SlotManager from './pages/SlotManager';
 import AppointmentForm from './components/AppointmentForm';
 import AppointmentViewer from './pages/AppointmentsViewer';
 import UserManager from './pages/UserManager';
+import Terms from './pages/Terms';
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/your-orders" element={<UserOrders />} />
+          <Route path="/terms" element={<Terms />} />
 
           {/* Route for unauthorized access */}
           {/* Protected Admin Route */}

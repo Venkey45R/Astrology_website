@@ -106,7 +106,7 @@ const HomePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-700 text-2xl font-semibold font-inter">
+      <div className="min-h-screen flex items-center justify-center  text-2xl font-semibold font-inter">
         <svg
           className="animate-spin h-8 w-8 mr-3 text-indigo-500"
           viewBox="0 0 24 24"

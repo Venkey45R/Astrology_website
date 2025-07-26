@@ -5,7 +5,7 @@ import { FaPhone } from "react-icons/fa6";
 import { IoIosMail } from "react-icons/io";
 import { IoMdTime } from "react-icons/io";
 import { AiFillFacebook } from "react-icons/ai";
-import { Clock, Mail, MapPin, Phone } from 'lucide-react';
+import { Clock, FileText, Mail, MapPin, Phone } from 'lucide-react';
 const Footer = () => {
   return (
 
@@ -18,6 +18,7 @@ const Footer = () => {
               <div className="flex items-center gap-3"><Mail className="w-5 h-5 text-blue-400" /><span>kalagaprasadastrology@gmail.com</span></div>
 
               <div className="flex items-center gap-3"><AiFillFacebook className="w-5 h-5 text-blue-400" /><a href='https://www.facebook.com/prasad.kalaga1'><span>Facebook</span></a></div>
+              <div className="flex items-center gap-3"><FileText className="w-5 h-5 text-blue-400" /><a href='/terms' className='hover:underline'>Terms and Conditions</a></div>
 
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-purple-400 mt-1" />
