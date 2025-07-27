@@ -27,19 +27,19 @@ const SigninButton = () => {
     const fetchUserProfile = async () => {
       const token = Cookies.get("token"); // Get the token from the cookie
 
-      if (!token) {
-        toast.error("You are not logged in. Redirecting to sign-in.", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-        navigate("/"); // Redirect to sign-in page if no token
-        return;
-      }
+      // if (!token) {
+      //   toast.error("You are not logged in. Redirecting to sign-in.", {
+      //     position: "top-right",
+      //     autoClose: 3000,
+      //     hideProgressBar: false,
+      //     closeOnClick: true,
+      //     pauseOnHover: true,
+      //     draggable: true,
+      //     progress: undefined,
+      //   });
+      //   navigate("/login"); // Redirect to sign-in page if no token
+      //   return;
+      // }
 
       try {
         // Send the token in the Authorization header as a Bearer token
@@ -54,20 +54,20 @@ const SigninButton = () => {
           "Failed to fetch user profile:",
           error.response?.data || error.message
         );
-        toast.error("Failed to load profile. Please log in again.", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        // toast.error("Failed to load profile. Please log in again.", {
+        //   position: "top-right",
+        //   autoClose: 3000,
+        //   hideProgressBar: false,
+        //   closeOnClick: true,
+        //   pauseOnHover: true,
+        //   draggable: true,
+        //   progress: undefined,
+        // });
         // Clear potentially invalid token and redirect
         Cookies.remove("token");
         Cookies.remove("role");
         Cookies.remove("id");
-        navigate("/");
+        // navigate("/login");
       } finally {
         setLoading(false);
       }
@@ -97,15 +97,15 @@ const SigninButton = () => {
       navigate("/"); // Redirect to the sign-in page
     } catch (error) {
       console.error("Logout failed:", error.response?.data || error.message);
-      toast.error("Logout failed. Please try again.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      // toast.error("Logout failed. Please try again.", {
+      //   position: "top-right",
+      //   autoClose: 3000,
+      //   hideProgressBar: false,
+      //   closeOnClick: true,
+      //   pauseOnHover: true,
+      //   draggable: true,
+      //   progress: undefined,
+      // });
     }
   };
 

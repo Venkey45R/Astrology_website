@@ -71,7 +71,7 @@ const UserOrders = () => {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="min-h-[80vh] p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold text-yellow-300 mb-4">My Orders</h2>
       {bookings.length === 0 ? (
         <div className="text-white">You have no orders yet.</div>

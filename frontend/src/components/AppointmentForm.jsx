@@ -132,6 +132,10 @@ const timeSlots = allSlotRanges.map((time) => {
 
     useEffect(() => {
         const token = Cookies.get("token"); 
+        if (!token) {
+            navigate("/login");
+            return;
+        }
         axios.get(`${API_BASE_URL}/api/unavailable-slots`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -157,7 +161,7 @@ const timeSlots = allSlotRanges.map((time) => {
           draggable: true,
           progress: undefined,
         });
-        navigate("/"); // Redirect to sign-in page if no token
+        navigate("/login"); // Redirect to sign-in page if no token
         return;
       }
 
@@ -188,7 +192,7 @@ const timeSlots = allSlotRanges.map((time) => {
         Cookies.remove("token");
         Cookies.remove("role");
         Cookies.remove("id");
-        navigate("/");
+        navigate("/login");
       } finally {
         setLoading(false);
       }

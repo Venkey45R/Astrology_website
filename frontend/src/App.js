@@ -33,8 +33,8 @@ function App() {
       <ToastContainer />
         <Navbar/>
         <Routes>
-          <Route path="/" element={<GoogleSignin />} />
-          <Route path="/home" element={<HomePage />} />
+          <Route path="/login" element={<GoogleSignin />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/your-orders" element={<UserOrders />} />

@@ -21,7 +21,7 @@ const Navbar = () => {
         {/* Logo */}
         <div className="flex items-center gap-3 cursor-pointer">
           <div className="text-3xl">🌟</div>
-          <a href='/home'>
+          <a href='/'>
             <div>
               <h1 className="text-xl font-bold text-yellow-300">Kalaga Prasad Astrology</h1>
               <p className="text-sm text-blue-200">Scientific Astrology Expert</p>
@@ -31,7 +31,7 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden sm:flex items-center gap-6">
-          <a href='/home'>
+          <a href='/'>
             <button className="text-white hover:text-yellow-300">Home</button>
           </a>
           <a href="#services">
@@ -68,7 +68,7 @@ const Navbar = () => {
       {menuOpen && (
         <div className="sm:hidden px-4 pb-4">
           <div className="flex flex-col gap-4 p-4 rounded-lg ">
-            <a href="/home" className="text-white hover:text-yellow-300 text-center">Home</a>
+            <a href="/" className="text-white hover:text-yellow-300 text-center">Home</a>
             <a href="#services" className="text-white hover:text-yellow-300 text-center">Services</a>
             {loggedIn && (
               <a href="/your-orders" className="text-white hover:text-yellow-300 text-center">Your Orders</a>

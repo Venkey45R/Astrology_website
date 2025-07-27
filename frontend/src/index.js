@@ -8,7 +8,7 @@ import { BrowserRouter } from 'react-router';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
-
+console.log("Google Client ID:", CLIENT_ID); // Log the client ID for debugging
 root.render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={CLIENT_ID}>

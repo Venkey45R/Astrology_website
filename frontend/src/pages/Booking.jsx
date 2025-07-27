@@ -12,6 +12,7 @@ const API_BASE_URL = (
 ).replace(/\/+$/, "");
 
 const Booking = () => {
+
   return (
     <div className='w-full'>
         <div className='w-full max-w-7xl mx-auto flex flex-col p'>

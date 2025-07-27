@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"; // Import js-cookie
 import { toast } from "react-toastify"; // Import toast
 
@@ -14,6 +14,8 @@ const API_BASE_URL = (
 
 const GoogleSignin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/";
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
 
@@ -80,7 +82,8 @@ const GoogleSignin = () => {
           draggable: true,
           progress: undefined,
         });
-        navigate("/home"); // Navigate to the new home page
+        navigate(from); // go to where user intended
+
       } else {
         toast.error("Sign-in failed. Please try again.", {
           position: "top-right",
@@ -151,7 +154,7 @@ const GoogleSignin = () => {
         <h2 className="text-2xl text-white">You are Signed In!</h2>
        
         <button
-          onClick={() => navigate("/home")}
+          onClick={() => navigate("/")}
           className="flex items-center gap-2 px-8 py-2 mt-4 text-lg text-white bg-green-500 rounded-lg hover:bg-green-600 transition duration-200"
         >
           Go to Home Page.
