@@ -17,6 +17,7 @@ router.post("/", protect, async (req, res) => {
       isAvailable: false,
     });
 
+    
     res.status(201).json(newSlot);
   } catch (err) {
     console.error("Error creating unavailable slot:", err);
