@@ -2,6 +2,10 @@
 const express = require("express");
 const Booking = require("../models/Booking");
 const { protect } = require("../middleware/authmiddleware");
+const axios = require("axios");
+require("dotenv").config();
+const { CASHFREE_CLIENT_ID, CASHFREE_CLIENT_SECRET, CASHFREE_API_URL } =
+  process.env;
 
 const router = express.Router();
 
@@ -110,6 +114,54 @@ router.delete("/:id", protect, async (req, res) => {
   } catch (error) {
     console.error("Error deleting booking:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.get("/verify-payment/:orderId", async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    // Step 1: Call Cashfree API to get order details
+    const cashfreeResponse = await axios.get(
+      `${CASHFREE_API_URL}/orders/${orderId}/payments`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-version": "2023-08-01",
+          "x-client-id": CASHFREE_CLIENT_ID,
+          "x-client-secret": CASHFREE_CLIENT_SECRET,
+        },
+      }
+    );
+
+    const paymentDetails = cashfreeResponse.data[0];
+    const cashfreeStatus = paymentDetails.payment_status;
+
+    // Step 2: Find the corresponding booking in your database
+    const booking = await Booking.findOne({ booking_id: orderId });
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    // Step 3: Update the booking payment status if it was successful
+    if (cashfreeStatus === "SUCCESS") {
+      booking.payment_status = true;
+      await booking.save();
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Payment not successful", status: cashfreeStatus });
+    }
+
+    // Step 4: Return the updated booking details to the frontend
+    res.json(booking);
+  } catch (error) {
+    console.error(
+      "Error verifying payment:",
+      error.response?.data || error.message
+    );
+    res.status(500).json({ message: "Payment verification failed." });
   }
 });
 
