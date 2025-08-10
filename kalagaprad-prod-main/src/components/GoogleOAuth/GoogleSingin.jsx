@@ -74,15 +74,15 @@ const GoogleSignin = () => {
         setUserName(name); // Set user name for display
         setIsLoggedIn(true); // Update login state
 
-        toast.success("Sign-in successful!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        // toast.success("Sign-in successful!", {
+        //   position: "top-right",
+        //   autoClose: 3000,
+        //   hideProgressBar: false,
+        //   closeOnClick: true,
+        //   pauseOnHover: true,
+        //   draggable: true,
+        //   progress: undefined,
+        // });
           if(res.data.role === "admin") {
           navigate("/admin"); 
           return;
@@ -92,15 +92,15 @@ const GoogleSignin = () => {
 
 
       } else {
-        toast.error("Sign-in failed. Please try again.", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        // toast.error("Sign-in failed. Please try again.", {
+        //   position: "top-right",
+        //   autoClose: 3000,
+        //   hideProgressBar: false,
+        //   closeOnClick: true,
+        //   pauseOnHover: true,
+        //   draggable: true,
+        //   progress: undefined,
+        // });
       }
     } catch (err) {
       console.error("Google sign-in failed", err.response?.data || err.message);

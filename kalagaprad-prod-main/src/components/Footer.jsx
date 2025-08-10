@@ -48,7 +48,11 @@ const Footer = () => {
           </div>
         </div>
         <div className="max-w-6xl mx-auto mt-8 pt-8 border-t border-yellow-400/20 text-center text-sm text-blue-200">
-          <a href='/terms' className='hover:underline '>Terms and Conditions</a>
+          <div className='flex justify-center items-center'>
+            <a href='/refund-policy' className='mr-4 hover:underline'>Refund Policy</a>
+            <a href='/business-policy' className='mr-4 hover:underline'>Business Policy</a>
+            <a href='/terms' className='hover:underline '>Terms and Conditions</a>
+          </div>
           <p className='mt-2'>&copy; 2024 Kalaga Prasad Astrology. All rights reserved.</p>
           <p className="mt-2 text-sm">Serving with 30+ years of experience in Scientific Astrology</p>
         </div>

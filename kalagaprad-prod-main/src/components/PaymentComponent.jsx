@@ -25,7 +25,7 @@ const PaymentComponent = ({ paymentAmount, formData, userInfo }) => {
     const initializeCashfree = async () => {
       try {
         const cashfreeJs = await load({
-          mode: "production", 
+          mode: "sandbox",
         });
         setCashfree(cashfreeJs);
       } catch (error) {
