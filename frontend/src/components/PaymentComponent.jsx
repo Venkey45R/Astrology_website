@@ -1,9 +1,11 @@
+// src/components/PaymentComponent.jsx
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { v4 as uuid } from "uuid";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+import { load } from "@cashfreepayments/cashfree-js";
 
 const API_BASE_URL = (
   process.env.REACT_APP_API_BASE_URL || "http://localhost:8080"
@@ -12,12 +14,25 @@ const API_BASE_URL = (
 const PaymentComponent = ({ paymentAmount, formData, userInfo }) => {
   const navigate = useNavigate();
   const [token, setToken] = useState(null);
+  const [cashfree, setCashfree] = useState(null);
 
   useEffect(() => {
     const savedToken = Cookies.get("token");
     if (savedToken) {
       setToken(savedToken);
     }
+
+    const initializeCashfree = async () => {
+      try {
+        const cashfreeJs = await load({
+          mode: "sandbox",
+        });
+        setCashfree(cashfreeJs);
+      } catch (error) {
+        console.error("Failed to load Cashfree SDK:", error);
+      }
+    };
+    initializeCashfree();
   }, []);
 
   const blockSlot = async () => {
@@ -42,75 +57,78 @@ const PaymentComponent = ({ paymentAmount, formData, userInfo }) => {
   };
 
   const handlePayment = async () => {
-  const booking_id = uuid();
+    const booking_id = uuid(); // This is the unique ID for the booking
 
-  const formattedFormData = {
-    booking_id,
-    name: formData.name,
-    email: userInfo.email,
-    appointment_type: formData.appointmentType,
-    whatsapp_number: formData.phone,
-    city: formData.city,
-    date: formData.pickedDate,
-    time_slot: formData.timeSlot,
-    payment_status: false,
-  };
-
-  let book;
-  try {
-    const booking = await axios.post(
-      `${API_BASE_URL}/api/bookings`,
-      formattedFormData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    book = booking.data;
-    await blockSlot();
-  } catch (err) {
-    console.error(err);
-    toast.error("Booking creation failed.");
-    return;
-  }
-
-  try {
-    const response = await axios.post(`${API_BASE_URL}/api/payu/payment`, {
-      amount: paymentAmount,
-      firstname: formData.name,
+    const formattedFormData = {
+      booking_id,
+      name: formData.name,
       email: userInfo.email,
-      phone: formData.phone,
-      productinfo: "Astrology Booking",
-    });
+      appointment_type: formData.appointmentType,
+      whatsapp_number: formData.phone,
+      city: formData.city,
+      date: formData.pickedDate,
+      time_slot: formData.timeSlot,
+      payment_status: false,
+    };
 
-    const { action, params } = response.data;
+    let book;
+    try {
+      // Step 1: Create the booking in the DB first
+      const booking = await axios.post(
+        `${API_BASE_URL}/api/bookings`,
+        formattedFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      book = booking.data;
+      await blockSlot();
+    } catch (err) {
+      console.error(err);
+      toast.error("Booking creation failed.");
+      return;
+    }
 
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = action;
+    if (!cashfree) {
+      toast.error(
+        "Cashfree SDK not loaded. Please wait a moment and try again."
+      );
+      return;
+    }
 
-    Object.keys(params).forEach((key) => {
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = key;
-      input.value = params[key];
-      form.appendChild(input);
-    });
+    try {
+      // Step 2: Now call the backend payment route, passing the booking_id
+      const response = await axios.post(
+        `${API_BASE_URL}/api/cashfree/payment`,
+        {
+          amount: paymentAmount,
+          firstname: formData.name,
+          email: userInfo.email,
+          phone: formData.phone,
+          productinfo: "Astrology Booking",
+          booking_id: formattedFormData.booking_id, // Pass the booking_id
+        }
+      );
 
-    document.body.appendChild(form);
-    form.submit();
-  } catch (err) {
-    console.error("Error initiating PayU payment:", err);
-    toast.error("Payment initiation failed.");
-  }
-};
+      const { payment_session_id } = response.data;
+      const checkoutOptions = {
+        paymentSessionId: payment_session_id,
+        redirectionMode: "redirect",
+      };
 
+      await cashfree.checkout(checkoutOptions);
+    } catch (err) {
+      console.error("Error initiating Cashfree payment:", err);
+      toast.error("Payment initiation failed.");
+    }
+  };
 
   return (
     <div>
       <button
-        className="bg-green-500 rounded-lg px-4 py-1 text-white"
+        className="px-4 py-1 text-white bg-green-500 rounded-lg"
         onClick={handlePayment}
       >
         Pay Now
