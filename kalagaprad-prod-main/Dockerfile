@@ -1,17 +1,17 @@
-    # Stage 1: Build the React application
-    FROM node:22-alpine AS builder
-    WORKDIR /app
-    COPY . .
-    RUN npm ci
-    RUN npm run build
+# --- Dockerfile for Frontend (React) ---
+# Stage 1: Build the React application
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN npm ci
+RUN npm run build
 
-    # Stage 2: Serve the static files with Nginx
-    FROM nginx:alpine
-    COPY --from=builder /app/build /usr/share/nginx/html
+# Stage 2: Serve the static files with Nginx
+FROM nginx:alpine
+COPY --from=builder /app/build /usr/share/nginx/html
 
-    # Copy the custom nginx configuration file into the container
-    COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy the custom nginx configuration file into the container
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-    EXPOSE 80
-    CMD ["nginx", "-g", "daemon off;"]
-    
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
