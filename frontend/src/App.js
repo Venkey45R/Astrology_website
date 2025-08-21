@@ -30,8 +30,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <ToastContainer />
-        <Navbar />
+      <ToastContainer />
+        <Navbar/>
         <Routes>
           <Route path="/login" element={<GoogleSignin />} />
           <Route path="/" element={<HomePage />} />
@@ -77,7 +77,7 @@ function App() {
           <Route path="/payment-status" element={<PaymentSuccess />} />
           {/* Add other routes here as your application grows */}
         </Routes>
-        <Footer />
+        <Footer/>
       </header>
     </div>
   );

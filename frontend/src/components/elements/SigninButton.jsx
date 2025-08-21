@@ -94,7 +94,7 @@ const SigninButton = () => {
         draggable: true,
         progress: undefined,
       });
-      navigate("/"); // Redirect to the sign-in page
+      // navigate("/"); // Redirect to the sign-in page
     } catch (error) {
       console.error("Logout failed:", error.response?.data || error.message);
       // toast.error("Logout failed. Please try again.", {
